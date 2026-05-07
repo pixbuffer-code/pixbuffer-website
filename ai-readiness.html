@@ -8,6 +8,19 @@
   <link rel="icon" href="fav1.ico" type="image/x-icon">
   <link rel="stylesheet" href="style.css?v=1.0.4">
   <style>
+    /* ── Dark theme ────────────────────────────────────────── */
+    html, body {
+      --bg:          #0f0a0b;
+      --surface:     #18100f;
+      --border:      rgba(191,30,45,0.14);
+      --text:        #f2ede8;
+      --text-muted:  #a89e9a;
+      --text-faint:  #7a706e;
+      --accent-muted: rgba(191,30,45,0.18);
+      background-color: #0f0a0b;
+      color: #f2ede8;
+    }
+
     /* ── Wizard layout ─────────────────────────────────────── */
     #quiz-page {
       min-height: 100vh;
@@ -16,8 +29,8 @@
     }
 
     #quiz-header {
-      background-color: var(--surface);
-      border-bottom: 1px solid var(--border);
+      background-color: #0f0a0b;
+      border-bottom: 1px solid rgba(191,30,45,0.18);
       padding: 0 var(--s4);
     }
 
@@ -43,9 +56,14 @@
 
     /* ── Progress bar ──────────────────────────────────────── */
     #progress-bar-wrap {
-      background-color: var(--surface);
-      border-bottom: 1px solid var(--border);
-      padding: 0 var(--s4) var(--s3);
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      background-color: #18100f;
+      border-top: 1px solid rgba(191,30,45,0.18);
+      padding: var(--s2) var(--s4) var(--s3);
     }
 
     .progress-meta {
@@ -92,7 +110,7 @@
       flex: 1;
       display: flex;
       align-items: flex-start;
-      padding: var(--s10) var(--s4);
+      padding: var(--s10) var(--s4) 100px;
     }
 
     .quiz-inner {
@@ -316,7 +334,7 @@
         Back to PixBuffer
       </a>
       <a href="/" aria-label="PixBuffer home">
-        <img src="pixbuffer-logo-2026.svg" alt="PixBuffer" height="28" width="auto">
+        <img src="pixbuffer-logo-2026.svg" alt="PixBuffer" height="28" width="auto" style="filter: brightness(0) invert(1);">
       </a>
     </div>
   </header>
@@ -325,7 +343,7 @@
   <div id="progress-bar-wrap">
     <div class="progress-meta">
       <span class="progress-label">AI Readiness Check</span>
-      <span class="progress-step" id="progress-step-label">Question 1 of 8</span>
+      <span class="progress-step" id="progress-step-label">0%</span>
     </div>
     <div class="progress-track">
       <div class="progress-fill" id="progress-fill"></div>
@@ -369,22 +387,6 @@
           <a href="index.html#packages" class="btn btn-outline">View Packages</a>
         </div>
 
-        <!-- Tally.so email capture -->
-        <div id="tally-wrap">
-          <p class="tally-label">Want a personalized breakdown sent to your inbox?</p>
-          <!-- Replace FORM_ID with your actual Tally form ID -->
-          <iframe
-            data-tally-src="https://tally.so/embed/FORM_ID?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1"
-            loading="lazy"
-            width="100%"
-            height="200"
-            frameborder="0"
-            marginheight="0"
-            marginwidth="0"
-            title="Get your AI Readiness report"
-            style="border:none; background:transparent;">
-          </iframe>
-        </div>
 
         <button class="btn btn-ghost" id="btn-retake">← Retake the check</button>
       </section>
@@ -570,6 +572,17 @@
       });
 
       btnNext.disabled = false;
+
+      setTimeout(() => {
+        if (current < QUESTIONS.length - 1) {
+          current++;
+          showQuestion(current);
+        } else {
+          progressFill.style.width = '100%';
+          progressLabel.textContent = '100%';
+          showResults();
+        }
+      }, 380);
     });
 
     /* ============================================================
@@ -585,7 +598,7 @@
 
       const pct = Math.round((index / QUESTIONS.length) * 100);
       progressFill.style.width = pct + '%';
-      progressLabel.textContent = `Question ${index + 1} of ${QUESTIONS.length}`;
+      progressLabel.textContent = pct + '%';
     }
 
     btnNext.addEventListener('click', () => {
@@ -595,6 +608,8 @@
         current++;
         showQuestion(current);
       } else {
+        progressFill.style.width = '100%';
+        progressLabel.textContent = '100%';
         showResults();
       }
     });
