@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>OG Image Generator — PixBuffer</title>
+  <style>
+    body {
+      margin: 0;
+      background: #1a1a1a;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      font-family: system-ui, sans-serif;
+      padding: 24px;
+      box-sizing: border-box;
+    }
+    canvas { display: block; max-width: 100%; border: 1px solid #333; }
+    .controls { margin-top: 20px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+    button {
+      background: #bf1e2d; color: white; border: none;
+      padding: 13px 32px; font-size: 15px; border-radius: 6px;
+      cursor: pointer; font-family: system-ui, sans-serif;
+    }
+    button:hover { background: #a01825; }
+    p { color: #777; font-size: 13px; text-align: center; margin: 0; }
+  </style>
+</head>
+<body>
+  <canvas id="og-canvas" width="1200" height="630"></canvas>
+  <div class="controls">
+    <button onclick="download()">Download og-image.png</button>
+    <p>Move the downloaded file into your pixbuffer/ project folder, then it's ready to deploy.</p>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('og-canvas');
+    const ctx    = canvas.getContext('2d');
+    const W = 1200, H = 630;
+
+    function draw(logo) {
+      // Background
+      ctx.fillStyle = '#0f0a0b';
+      ctx.fillRect(0, 0, W, H);
+
+      // Subtle red radial glow (bottom-right)
+      const grd = ctx.createRadialGradient(1080, 610, 0, 1080, 610, 520);
+      grd.addColorStop(0, 'rgba(191,30,45,0.2)');
+      grd.addColorStop(1, 'rgba(191,30,45,0)');
+      ctx.fillStyle = grd;
+      ctx.fillRect(0, 0, W, H);
+
+      // Red top accent bar
+      ctx.fillStyle = '#bf1e2d';
+      ctx.fillRect(0, 0, W, 6);
+
+      // Logo — white monochrome
+      if (logo) {
+        ctx.save();
+        ctx.filter = 'brightness(0) invert(1)';
+        ctx.globalAlpha = 0.92;
+        // Native logo ratio ~4.13:1
+        const lw = 340, lh = Math.round(340 / 4.13);
+        ctx.drawImage(logo, 80, 56, lw, lh);
+        ctx.restore();
+      }
+
+      // Headline — white
+      ctx.fillStyle = '#f2ede8';
+      ctx.font = 'bold 60px Futura, "Century Gothic", system-ui, sans-serif';
+      ctx.fillText('Real AI. Custom Software.', 80, 298);
+
+      // Headline — red accent line
+      ctx.fillStyle = '#bf1e2d';
+      ctx.fillText('Measurable outcomes.', 80, 374);
+
+      // Description
+      ctx.fillStyle = '#a89e9a';
+      ctx.font = '26px Futura, "Century Gothic", system-ui, sans-serif';
+      ctx.fillText('AI Agency & Software Development  ·  Calgary, Alberta  ·  Est. 2009', 80, 476);
+
+      // Divider
+      ctx.strokeStyle = 'rgba(191,30,45,0.22)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(80, 514);
+      ctx.lineTo(W - 80, 514);
+      ctx.stroke();
+
+      // URL
+      ctx.fillStyle = '#7a706e';
+      ctx.font = '22px Futura, "Century Gothic", system-ui, sans-serif';
+      ctx.fillText('pixbuffer.com', 80, 578);
+    }
+
+    function download() {
+      const link = document.createElement('a');
+      link.download = 'og-image.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
+
+    const logo = new Image();
+    logo.onload  = () => draw(logo);
+    logo.onerror = () => draw(null);
+    logo.src = 'pixbuffer-logo-2026.svg';
+  </script>
+</body>
+</html>

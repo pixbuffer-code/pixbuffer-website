@@ -3,8 +3,27 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Take PixBuffer's free 10-minute AI Readiness Check to find out exactly where your business stands on AI adoption.">
-  <title>AI Readiness Check — PixBuffer</title>
+  <title>AI Readiness Check — Free 5-Minute Quiz | PixBuffer</title>
+  <meta name="description" content="Take PixBuffer's free 5-minute AI Readiness Check to find out exactly where your business stands on AI adoption and where to focus first.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://pixbuffer.com/ai-readiness.html">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://pixbuffer.com/ai-readiness.html">
+  <meta property="og:site_name" content="PixBuffer">
+  <meta property="og:title" content="AI Readiness Check — Free 5-Minute Quiz | PixBuffer">
+  <meta property="og:description" content="Answer 8 quick questions and get an instant AI readiness score for your business. Free, no email required.">
+  <meta property="og:image" content="https://pixbuffer.com/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="AI Readiness Check — Free 5-Minute Quiz | PixBuffer">
+  <meta name="twitter:description" content="Find out how AI-ready your business is in 5 minutes. Free, instant score, no email required.">
+  <meta name="twitter:image" content="https://pixbuffer.com/og-image.png">
+
   <link rel="icon" href="fav1.ico" type="image/x-icon">
   <link rel="stylesheet" href="style.css?v=1.0.4">
   <style>
@@ -528,6 +547,7 @@
       const letters = ['A', 'B', 'C', 'D'];
 
       screen.innerHTML = `
+        ${qi === 0 ? '<p class="eyebrow" style="margin-bottom: var(--s3);">Estimated Time: 5 minutes or less.</p>' : ''}
         <p class="question-text" id="ql-${qi}">${q.text}</p>
         <ul class="options-list" role="radiogroup">
           ${q.options.map((opt, oi) => `
