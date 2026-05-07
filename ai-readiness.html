@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Take PixBuffer's free 10-minute AI Readiness Check to find out exactly where your business stands on AI adoption.">
+  <title>AI Readiness Check — PixBuffer</title>
+  <link rel="icon" href="fav1.ico" type="image/x-icon">
+  <link rel="stylesheet" href="style.css?v=1.0.0">
+  <style>
+    /* ── Wizard layout ─────────────────────────────────────── */
+    #quiz-page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #quiz-header {
+      background-color: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 var(--s4);
+    }
+
+    .quiz-header-inner {
+      max-width: 720px;
+      margin: 0 auto;
+      height: 76px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .quiz-back {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: color var(--t);
+    }
+    .quiz-back:hover { color: var(--accent); }
+    .quiz-back svg   { flex-shrink: 0; }
+
+    /* ── Progress bar ──────────────────────────────────────── */
+    #progress-bar-wrap {
+      background-color: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 var(--s4) var(--s3);
+    }
+
+    .progress-meta {
+      max-width: 720px;
+      margin: 0 auto var(--s2);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .progress-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-faint);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .progress-step {
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--text-faint);
+    }
+
+    .progress-track {
+      max-width: 720px;
+      margin: 0 auto;
+      height: 3px;
+      background-color: var(--border);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background-color: var(--accent);
+      border-radius: 99px;
+      transition: width 0.4s ease;
+      width: 0%;
+    }
+
+    /* ── Wizard body ───────────────────────────────────────── */
+    #quiz-body {
+      flex: 1;
+      display: flex;
+      align-items: flex-start;
+      padding: var(--s10) var(--s4);
+    }
+
+    .quiz-inner {
+      max-width: 720px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    /* ── Question screen ───────────────────────────────────── */
+    .question-screen {
+      display: none;
+      animation: fadeUp 0.32s ease;
+    }
+
+    .question-screen.active { display: block; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .question-text {
+      font-size: clamp(1.4rem, 3vw, 1.9rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+      color: var(--text);
+      margin-bottom: var(--s5);
+    }
+
+    /* ── Answer options ────────────────────────────────────── */
+    .options-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--s2);
+    }
+
+    .option-btn {
+      display: flex;
+      align-items: center;
+      gap: var(--s3);
+      width: 100%;
+      padding: var(--s3) var(--s4);
+      background-color: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--r);
+      cursor: pointer;
+      text-align: left;
+      font-family: var(--font);
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--text);
+      transition: border-color var(--t), background-color var(--t), box-shadow var(--t);
+    }
+
+    .option-btn:hover {
+      border-color: var(--accent);
+      background-color: var(--accent-muted);
+    }
+
+    .option-btn.selected {
+      border-color: var(--accent);
+      background-color: var(--accent-muted);
+      box-shadow: 0 0 0 3px rgba(191,30,45,0.10);
+    }
+
+    .option-letter {
+      flex-shrink: 0;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 1.5px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-faint);
+      transition: border-color var(--t), color var(--t), background-color var(--t);
+    }
+
+    .option-btn.selected .option-letter,
+    .option-btn:hover .option-letter {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* ── Navigation ────────────────────────────────────────── */
+    .quiz-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: var(--s6);
+      padding-top: var(--s5);
+      border-top: 1px solid var(--border);
+    }
+
+    .quiz-nav .btn-ghost {
+      color: var(--text-muted);
+    }
+
+    #btn-next {
+      min-width: 140px;
+    }
+
+    /* ── Result screen ─────────────────────────────────────── */
+    #result-screen {
+      display: none;
+    }
+
+    #result-screen.active { display: block; }
+
+    .result-tier-label {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      background-color: var(--accent-muted);
+      padding: 5px 14px;
+      border-radius: 99px;
+      margin-bottom: var(--s4);
+    }
+
+    .result-headline {
+      font-size: clamp(2rem, 4vw, 2.8rem);
+      font-weight: 900;
+      letter-spacing: -0.025em;
+      line-height: 1.1;
+      color: var(--text);
+      margin-bottom: var(--s4);
+    }
+
+    .result-desc {
+      font-size: 1rem;
+      color: var(--text-muted);
+      line-height: 1.8;
+      max-width: 540px;
+      margin-bottom: var(--s6);
+    }
+
+    /* Score bar */
+    .score-bar-wrap {
+      margin-bottom: var(--s6);
+    }
+
+    .score-bar-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: var(--text-faint);
+      margin-bottom: var(--s1);
+    }
+
+    .score-bar-track {
+      height: 6px;
+      background-color: var(--border);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .score-bar-fill {
+      height: 100%;
+      background-color: var(--accent);
+      border-radius: 99px;
+      transition: width 1s ease 0.3s;
+      width: 0%;
+    }
+
+    /* CTA block */
+    .result-cta-block {
+      background-color: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-lg);
+      padding: var(--s5);
+      margin-bottom: var(--s6);
+    }
+
+    .result-cta-block h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: var(--s2);
+    }
+
+    .result-cta-block p {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.7;
+      margin-bottom: var(--s4);
+    }
+
+    .result-cta-block .btn { margin-right: var(--s2); }
+
+    /* Tally embed wrapper */
+    #tally-wrap {
+      margin-bottom: var(--s4);
+    }
+
+    .tally-label {
+      font-size: 0.8rem;
+      color: var(--text-faint);
+      margin-bottom: var(--s2);
+    }
+
+    @media (max-width: 480px) {
+      .result-cta-block .btn { width: 100%; margin-right: 0; margin-bottom: var(--s2); }
+    }
+  </style>
+</head>
+<body id="quiz-page">
+
+  <!-- HEADER -->
+  <header id="quiz-header">
+    <div class="quiz-header-inner">
+      <a href="index.html" class="quiz-back">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 12H5M12 5l-7 7 7 7"/>
+        </svg>
+        Back to PixBuffer
+      </a>
+      <a href="/" aria-label="PixBuffer home">
+        <img src="pixbuffer-logo-2026.svg" alt="PixBuffer" height="28" width="auto">
+      </a>
+    </div>
+  </header>
+
+  <!-- PROGRESS BAR -->
+  <div id="progress-bar-wrap">
+    <div class="progress-meta">
+      <span class="progress-label">AI Readiness Check</span>
+      <span class="progress-step" id="progress-step-label">Question 1 of 8</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progress-fill"></div>
+    </div>
+  </div>
+
+  <!-- QUIZ BODY -->
+  <div id="quiz-body">
+    <div class="quiz-inner">
+
+      <!-- Questions injected by JS -->
+      <div id="questions-container"></div>
+
+      <!-- Navigation -->
+      <nav class="quiz-nav" id="quiz-nav">
+        <button class="btn btn-ghost" id="btn-back" style="display:none;">← Back</button>
+        <div></div>
+        <button class="btn btn-primary" id="btn-next" disabled>Next →</button>
+      </nav>
+
+      <!-- Result screen -->
+      <section id="result-screen" aria-live="polite">
+        <span class="result-tier-label" id="result-tier"></span>
+        <h2 class="result-headline" id="result-headline"></h2>
+        <p class="result-desc" id="result-desc"></p>
+
+        <div class="score-bar-wrap">
+          <div class="score-bar-label">
+            <span>AI Readiness Score</span>
+            <span id="score-label"></span>
+          </div>
+          <div class="score-bar-track">
+            <div class="score-bar-fill" id="score-bar-fill"></div>
+          </div>
+        </div>
+
+        <div class="result-cta-block" id="result-cta-block">
+          <h3 id="cta-heading"></h3>
+          <p id="cta-body"></p>
+          <a href="https://calendly.com/pixbuffer/discovery-call" class="btn btn-primary" target="_blank" rel="noopener noreferrer">Book a Free AI Roadmap Call</a>
+          <a href="index.html#packages" class="btn btn-outline">View Packages</a>
+        </div>
+
+        <!-- Tally.so email capture -->
+        <div id="tally-wrap">
+          <p class="tally-label">Want a personalized breakdown sent to your inbox?</p>
+          <!-- Replace FORM_ID with your actual Tally form ID -->
+          <iframe
+            data-tally-src="https://tally.so/embed/FORM_ID?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1"
+            loading="lazy"
+            width="100%"
+            height="200"
+            frameborder="0"
+            marginheight="0"
+            marginwidth="0"
+            title="Get your AI Readiness report"
+            style="border:none; background:transparent;">
+          </iframe>
+        </div>
+
+        <button class="btn btn-ghost" id="btn-retake">← Retake the check</button>
+      </section>
+
+    </div>
+  </div>
+
+  <script>
+    /* ============================================================
+       QUIZ DATA
+       ============================================================ */
+    const QUESTIONS = [
+      {
+        text: "How would you describe your company's current use of AI?",
+        options: [
+          { label: "Just starting to explore",          score: 0 },
+          { label: "Experimenting with tools",          score: 1 },
+          { label: "Using AI in some workflows",        score: 2 },
+          { label: "Scaling AI across the business",    score: 3 }
+        ]
+      },
+      {
+        text: "How many people are in your organization?",
+        options: [
+          { label: "1 – 10",   score: 0 },
+          { label: "11 – 50",  score: 1 },
+          { label: "51 – 200", score: 2 },
+          { label: "200+",     score: 3 }
+        ]
+      },
+      {
+        text: "How organized and accessible is your business data?",
+        options: [
+          { label: "It's a mess — siloed and hard to access",         score: 0 },
+          { label: "Partially organized in a few places",             score: 1 },
+          { label: "Mostly structured and reasonably accessible",     score: 2 },
+          { label: "Clean, centralized, and well-documented",        score: 3 }
+        ]
+      },
+      {
+        text: "Do you have any AI or data expertise in-house?",
+        options: [
+          { label: "None at all",                       score: 0 },
+          { label: "One or two people dabbling",        score: 1 },
+          { label: "A few people with solid skills",   score: 2 },
+          { label: "A dedicated AI or data team",       score: 3 }
+        ]
+      },
+      {
+        text: "What's your biggest barrier to AI adoption right now?",
+        options: [
+          { label: "Don't know where to start",         score: 0 },
+          { label: "No technical resources in-house",   score: 1 },
+          { label: "Unclear ROI or business case",      score: 1 },
+          { label: "Risk, governance, or compliance",   score: 2 }
+        ]
+      },
+      {
+        text: "Have you evaluated any AI tools or vendors yet?",
+        options: [
+          { label: "No, not yet",                       score: 0 },
+          { label: "Looked at a few casually",          score: 1 },
+          { label: "Actively comparing options",        score: 2 },
+          { label: "Already using some in production",  score: 3 }
+        ]
+      },
+      {
+        text: "What outcome matters most to your business right now?",
+        options: [
+          { label: "Reduce operational costs",          score: 1 },
+          { label: "Grow revenue",                      score: 2 },
+          { label: "Move and decide faster",            score: 2 },
+          { label: "Stay ahead of competitors",         score: 3 }
+        ]
+      },
+      {
+        text: "What's your timeline to act on AI?",
+        options: [
+          { label: "Just exploring for now",            score: 0 },
+          { label: "Within the next 6 months",          score: 1 },
+          { label: "Within the next 1–2 months",        score: 2 },
+          { label: "Ready to move now",                 score: 3 }
+        ]
+      }
+    ];
+
+    const TIERS = [
+      {
+        min: 0, max: 7,
+        tier:     "AI Aware",
+        headline: "You're at the start of your AI journey.",
+        desc:     "That's exactly the right time to get clarity before committing budget. Most businesses in your position benefit most from a structured assessment — understanding what's worth building before building anything.",
+        ctaHead:  "The AI Clarity Sprint is your next step.",
+        ctaBody:  "We'll spend one month mapping your highest-value AI opportunities and hand you a prioritized roadmap — so your first AI investment lands where it matters."
+      },
+      {
+        min: 8, max: 16,
+        tier:     "AI Ready",
+        headline: "You have a solid foundation to build on.",
+        desc:     "Your organization has the data, awareness, and appetite to move forward. The question isn't whether AI will help you — it's what to build first and how to ship it well.",
+        ctaHead:  "The AI Build & Launch package is built for you.",
+        ctaBody:  "We design, build, and deploy a production-ready AI solution inside your business — with a custom dashboard so you can measure impact from day one."
+      },
+      {
+        min: 17, max: 24,
+        tier:     "AI Leading",
+        headline: "You're ahead of most — now protect that lead.",
+        desc:     "Your business is already using AI in meaningful ways. The risk now is fragmentation — disparate tools, no governance, and no one owning the long-term strategy. The companies that stay ahead are the ones that treat AI leadership as a function, not a project.",
+        ctaHead:  "A Fractional Chief AI Officer keeps you ahead.",
+        ctaBody:  "Strategic AI leadership embedded in your team — vendor governance, roadmap ownership, and team upskilling — without the full-time executive cost."
+      }
+    ];
+
+    /* ============================================================
+       STATE
+       ============================================================ */
+    let current  = 0;
+    let answers  = new Array(QUESTIONS.length).fill(null);
+
+    const container     = document.getElementById('questions-container');
+    const resultScreen  = document.getElementById('result-screen');
+    const quizNav       = document.getElementById('quiz-nav');
+    const btnNext       = document.getElementById('btn-next');
+    const btnBack       = document.getElementById('btn-back');
+    const progressFill  = document.getElementById('progress-fill');
+    const progressLabel = document.getElementById('progress-step-label');
+    const progressWrap  = document.getElementById('progress-bar-wrap');
+
+    /* ============================================================
+       BUILD QUESTION SCREENS
+       ============================================================ */
+    QUESTIONS.forEach((q, qi) => {
+      const screen = document.createElement('div');
+      screen.className = 'question-screen' + (qi === 0 ? ' active' : '');
+      screen.id = `q-${qi}`;
+      screen.setAttribute('role', 'group');
+      screen.setAttribute('aria-labelledby', `ql-${qi}`);
+
+      const letters = ['A', 'B', 'C', 'D'];
+
+      screen.innerHTML = `
+        <p class="question-text" id="ql-${qi}">${q.text}</p>
+        <ul class="options-list" role="radiogroup">
+          ${q.options.map((opt, oi) => `
+            <li>
+              <button
+                class="option-btn"
+                data-q="${qi}"
+                data-o="${oi}"
+                role="radio"
+                aria-checked="false"
+              >
+                <span class="option-letter" aria-hidden="true">${letters[oi]}</span>
+                ${opt.label}
+              </button>
+            </li>
+          `).join('')}
+        </ul>
+      `;
+
+      container.appendChild(screen);
+    });
+
+    /* ============================================================
+       OPTION SELECTION
+       ============================================================ */
+    container.addEventListener('click', e => {
+      const btn = e.target.closest('.option-btn');
+      if (!btn) return;
+
+      const qi = parseInt(btn.dataset.q);
+      const oi = parseInt(btn.dataset.o);
+
+      if (qi !== current) return;
+
+      answers[qi] = oi;
+
+      // Update UI
+      document.querySelectorAll(`[data-q="${qi}"]`).forEach(b => {
+        const selected = parseInt(b.dataset.o) === oi;
+        b.classList.toggle('selected', selected);
+        b.setAttribute('aria-checked', String(selected));
+      });
+
+      btnNext.disabled = false;
+    });
+
+    /* ============================================================
+       NAVIGATION
+       ============================================================ */
+    function showQuestion(index) {
+      document.querySelectorAll('.question-screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(`q-${index}`).classList.add('active');
+
+      btnBack.style.display = index === 0 ? 'none' : '';
+      btnNext.textContent   = index === QUESTIONS.length - 1 ? 'See My Results' : 'Next →';
+      btnNext.disabled      = answers[index] === null;
+
+      const pct = Math.round((index / QUESTIONS.length) * 100);
+      progressFill.style.width = pct + '%';
+      progressLabel.textContent = `Question ${index + 1} of ${QUESTIONS.length}`;
+    }
+
+    btnNext.addEventListener('click', () => {
+      if (answers[current] === null) return;
+
+      if (current < QUESTIONS.length - 1) {
+        current++;
+        showQuestion(current);
+      } else {
+        showResults();
+      }
+    });
+
+    btnBack.addEventListener('click', () => {
+      if (current > 0) {
+        current--;
+        showQuestion(current);
+      }
+    });
+
+    /* ============================================================
+       RESULTS
+       ============================================================ */
+    function showResults() {
+      // Calculate score
+      const score = answers.reduce((sum, answerIdx, qi) => {
+        return sum + (answerIdx !== null ? QUESTIONS[qi].options[answerIdx].score : 0);
+      }, 0);
+
+      const maxScore = QUESTIONS.reduce((sum, q) => {
+        return sum + Math.max(...q.options.map(o => o.score));
+      }, 0);
+
+      const pct = Math.round((score / maxScore) * 100);
+      const tier = TIERS.find(t => score >= t.min && score <= t.max) || TIERS[0];
+
+      // Hide questions & nav, show result
+      container.style.display = 'none';
+      quizNav.style.display   = 'none';
+      progressWrap.style.display = 'none';
+      resultScreen.classList.add('active');
+
+      document.getElementById('result-tier').textContent     = tier.tier;
+      document.getElementById('result-headline').textContent = tier.headline;
+      document.getElementById('result-desc').textContent     = tier.desc;
+      document.getElementById('cta-heading').textContent     = tier.ctaHead;
+      document.getElementById('cta-body').textContent        = tier.ctaBody;
+      document.getElementById('score-label').textContent     = `${score} / ${maxScore}`;
+
+      // Animate score bar after paint
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          document.getElementById('score-bar-fill').style.width = pct + '%';
+        });
+      });
+
+      // Load Tally embed script if not already loaded
+      if (!window._tallyLoaded) {
+        const s = document.createElement('script');
+        s.src = 'https://tally.so/widgets/embed.js';
+        s.async = true;
+        document.head.appendChild(s);
+        window._tallyLoaded = true;
+      }
+    }
+
+    /* ============================================================
+       RETAKE
+       ============================================================ */
+    document.getElementById('btn-retake').addEventListener('click', () => {
+      answers  = new Array(QUESTIONS.length).fill(null);
+      current  = 0;
+
+      container.style.display    = '';
+      quizNav.style.display      = '';
+      progressWrap.style.display = '';
+      resultScreen.classList.remove('active');
+
+      document.querySelectorAll('.option-btn').forEach(b => {
+        b.classList.remove('selected');
+        b.setAttribute('aria-checked', 'false');
+      });
+
+      showQuestion(0);
+    });
+
+    /* ============================================================
+       INIT
+       ============================================================ */
+    showQuestion(0);
+  </script>
+
+</body>
+</html>
