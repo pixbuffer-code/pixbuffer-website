@@ -314,7 +314,7 @@ section { padding: var(--s16) 0; }
 }
 
 .hero-subhead {
-  font-size: clamp(1rem, 1.4vw, 1.15rem);
+  font-size: 1.3rem;
   color: var(--text-muted);
   line-height: 1.8;
   margin-bottom: var(--s5);
@@ -341,22 +341,25 @@ section { padding: var(--s16) 0; }
 .split-left .section-headline { margin-bottom: 0; }
 
 .steps {
-  margin-top: var(--s5);
-  padding-top: var(--s5);
+  margin-top: var(--s6);
+  padding-top: var(--s6);
   border-top: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   gap: var(--s4);
 }
 
 .step {
+  background-color: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: var(--s4);
   display: flex;
-  gap: var(--s3);
-  align-items: flex-start;
+  flex-direction: column;
+  gap: var(--s2);
 }
 
 .step-icon {
-  flex-shrink: 0;
   width: 42px;
   height: 42px;
   display: flex;
@@ -365,17 +368,17 @@ section { padding: var(--s16) 0; }
   background-color: var(--accent-muted);
   border-radius: var(--r);
   color: var(--accent);
+  margin-bottom: var(--s1);
 }
 
 .step-label {
-  font-size: 0.95rem;
+  font-size: 1.3rem;
   font-weight: 700;
   color: var(--text);
-  margin-bottom: 3px;
 }
 
 .step-desc {
-  font-size: 0.875rem;
+  font-size: 1.3rem;
   color: var(--text-muted);
   line-height: 1.6;
 }
@@ -494,7 +497,7 @@ section { padding: var(--s16) 0; }
 }
 
 .package-deliverables li {
-  font-size: 0.84rem;
+  font-size: 0.875rem;
   color: var(--text-muted);
   padding-left: 22px;
   position: relative;
@@ -518,7 +521,7 @@ section { padding: var(--s16) 0; }
 }
 
 .clients-body {
-  font-size: 1rem;
+  font-size: clamp(1.3rem, 1.82vw, 1.43rem);
   color: var(--text-muted);
   line-height: 1.8;
   margin-bottom: var(--s6);
@@ -572,7 +575,7 @@ section { padding: var(--s16) 0; }
 }
 
 .readiness-body {
-  font-size: 1rem;
+  font-size: 1.3rem;
   color: var(--text-muted);
   line-height: 1.8;
   margin: var(--s3) auto var(--s5);
@@ -718,6 +721,7 @@ a.contact-item:hover .contact-icon { background-color: var(--accent); color: #ff
   #hero          { min-height: auto; padding: var(--s10) 0; }
 
   .split         { grid-template-columns: 1fr; gap: var(--s6); }
+  .steps         { grid-template-columns: 1fr; }
   .contact-grid  { grid-template-columns: 1fr; gap: var(--s6); }
 
   .footer-inner  { flex-direction: column; text-align: center; gap: var(--s2); }
