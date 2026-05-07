@@ -119,6 +119,15 @@ section { padding: var(--s16) 0; }
 
 .accent { color: var(--accent); }
 
+.hero-blink-dot {
+  animation: hero-blink 1s step-end infinite;
+}
+
+@keyframes hero-blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
 /* ============================================================
    BUTTONS
    ============================================================ */

@@ -60,3 +60,70 @@ const revealObserver = new IntersectionObserver(
 );
 
 document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+/* ============================================================
+   HERO TYPEWRITER
+   ============================================================ */
+(function () {
+  const el = document.querySelector('.hero-headline');
+  if (!el) return;
+
+  const h = el.offsetHeight;
+  el.style.minHeight = h + 'px';
+  el.classList.add('visible');
+  el.innerHTML = '';
+
+  const lines = [
+    { text: 'Real AI.', accent: false },
+    { text: 'Custom Software.', accent: false },
+    { text: 'Measurable outcomes', accent: true },
+  ];
+
+  const chars = [];
+  lines.forEach((line, li) => {
+    if (li > 0) chars.push({ type: 'br' });
+    for (const ch of line.text) chars.push({ type: 'char', ch, accent: line.accent });
+  });
+  chars.push({ type: 'dot' });
+
+  let normalNode = document.createTextNode('');
+  let accentSpan = null;
+  let accentTextNode = null;
+  el.appendChild(normalNode);
+
+  const interval = 2400 / chars.length;
+  let i = 0;
+
+  function typeNext() {
+    if (i >= chars.length) return;
+    const item = chars[i++];
+
+    if (item.type === 'br') {
+      el.appendChild(document.createElement('br'));
+      normalNode = document.createTextNode('');
+      el.appendChild(normalNode);
+    } else if (item.type === 'char') {
+      if (item.accent) {
+        if (!accentSpan) {
+          accentSpan = document.createElement('span');
+          accentSpan.className = 'accent';
+          accentTextNode = document.createTextNode('');
+          accentSpan.appendChild(accentTextNode);
+          el.appendChild(accentSpan);
+        }
+        accentTextNode.data += item.ch;
+      } else {
+        normalNode.data += item.ch;
+      }
+    } else if (item.type === 'dot') {
+      const dot = document.createElement('span');
+      dot.className = 'accent hero-blink-dot';
+      dot.textContent = '.';
+      (accentSpan || el).appendChild(dot);
+    }
+
+    setTimeout(typeNext, interval);
+  }
+
+  typeNext();
+})();
